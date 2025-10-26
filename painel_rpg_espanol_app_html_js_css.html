@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel de Progresso — Español Avanzado (RPG)</title>
+  <meta name="theme-color" content="#0f172a">
+  <style>
+    :root{
+      --bg:#0b1220;/* slate-950 */
+      --card:#101b34;/* slate-900 */
+      --muted:#9fb0d0;
+      --text:#e6edf7;
+      --accent:#6ee7b7;/* emerald-300 */
+      --accent-2:#60a5fa;/* blue-400 */
+      --warn:#f59e0b;/* amber-500 */
+      --danger:#ef4444;/* red-500 */
+      --ok:#22c55e;/* green-500 */
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 16px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
+      background: radial-gradient(1200px 600px at 10% 0%, #0f1a33 0%, var(--bg) 45%),
+                  radial-gradient(900px 500px at 100% 0%, #0c1530 0%, transparent 50%),
+                  var(--bg);
+      color:var(--text);
+    }
+    header{
+      padding:28px 20px 6px; display:flex; align-items:center; gap:14px; flex-wrap:wrap
+    }
+    .logo{
+      height:44px; width:44px; border-radius:12px; background:linear-gradient(135deg, var(--accent), var(--accent-2));
+      display:grid; place-items:center; color:#0b1220; font-weight:900; box-shadow: var(--shadow);
+    }
+    h1{font-size: clamp(18px, 2.4vw, 26px); margin:0}
+    .sub{color:var(--muted); font-size:14px}
+
+    main{padding:16px; max-width:1200px; margin:0 auto}
+    .grid{display:grid; gap:16px}
+    @media(min-width:900px){ .grid{ grid-template-columns: 1.2fr .8fr } }
+
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)); border:1px solid rgba(255,255,255,.06);
+      border-radius:var(--radius); padding:16px; box-shadow:var(--shadow)}
+
+    .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+    .pill{padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.06); color:var(--muted); font-size:12px}
+
+    .kpis{display:grid; grid-template-columns: repeat(4, 1fr); gap:12px}
+    .kpi{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:12px}
+    .kpi .label{color:var(--muted); font-size:12px}
+    .kpi .value{font-size:22px; font-weight:700}
+
+    .progress{height:12px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden; position:relative}
+    .progress>span{display:block; height:100%; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); transition:width .5s ease}
+    .progress .pct{position:absolute; inset:0; display:grid; place-items:center; font-size:11px; color:#001; mix-blend-mode:screen; font-weight:700}
+
+    form{display:grid; gap:10px; margin-top:8px}
+    .grid2{display:grid; gap:10px}
+    @media(min-width:680px){ .grid2{grid-template-columns: 1fr 1fr 1fr} }
+    input, select, textarea, button{
+      width:100%; padding:10px 12px; border-radius:12px; background:#0d1830; border:1px solid rgba(255,255,255,.08); color:var(--text);
+    }
+    textarea{min-height:80px; resize:vertical}
+    button{cursor:pointer; font-weight:700; letter-spacing:.2px}
+    .primary{background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#0b1220; border:none}
+    .ghost{background:transparent; border:1px dashed rgba(255,255,255,.2); color:var(--muted)}
+    .danger{background:linear-gradient(90deg, #ffb4b4, #ff7b7b); color:#2a0b0b; border:none}
+
+    table{width:100%; border-collapse: collapse; margin-top:12px; font-size:14px}
+    th, td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.06)}
+    th{color:var(--muted); text-align:left; font-weight:600}
+    tbody tr:hover{background: rgba(255,255,255,.03)}
+
+    .badges{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px}
+    .badge{display:flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
+    .badge .name{font-weight:700}
+    .badge .desc{color:var(--muted); font-size:12px}
+
+    .weeks{display:grid; gap:10px; margin-top:10px}
+    .week{display:flex; align-items:center; gap:10px}
+    .week .bar{flex:1; height:10px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden}
+    .week .bar>span{display:block; height:100%; background:linear-gradient(90deg, var(--warn), var(--ok)); width:0%; transition:width .5s}
+
+    footer{padding:30px 16px 60px; color:var(--muted); text-align:center}
+    a.link{color:var(--accent)}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">XP</div>
+    <div>
+      <h1>RPG do Español Avanzado — Painel de Progresso</h1>
+      <div class="sub">Níveis • XP • Medalhas • Offline-first</div>
+    </div>
+    <div style="margin-left:auto" class="row">
+      <span class="pill" id="levelLabel">Nível 1 — Exploradora del idioma</span>
+      <span class="pill" id="monthLabel"></span>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="card">
+      <div class="row" style="justify-content:space-between; align-items:flex-end">
+        <div>
+          <h2 style="margin:0 0 6px 0">Progresso do mês</h2>
+          <div class="sub">Meta mensal: <b>100 XP</b></div>
+        </div>
+        <div class="kpis">
+          <div class="kpi"><div class="label">XP do mês</div><div class="value" id="xpMonth">0</div></div>
+          <div class="kpi"><div class="label">Progresso</div><div class="value" id="pctMonth">0%</div></div>
+          <div class="kpi"><div class="label">Atividades</div><div class="value" id="countMonth">0</div></div>
+          <div class="kpi"><div class="label">Medalhas</div><div class="value" id="countBadges">0</div></div>
+        </div>
+      </div>
+      <div class="progress" style="margin-top:12px">
+        <span id="barMonth"></span>
+        <div class="pct" id="barPct">0%</div>
+      </div>
+      <div class="weeks" id="weeks"></div>
+    </section>
+
+    <aside class="card">
+      <h3 style="margin-top:0">Nova atividade</h3>
+      <form id="activityForm">
+        <div class="grid2">
+          <div>
+            <label for="date">Data</label>
+            <input id="date" type="date" required />
+          </div>
+          <div>
+            <label for="type">Tipo</label>
+            <select id="type" required>
+              <option value="movie">🎬 Filme/Série (≥30min) — 10 XP</option>
+              <option value="podcast">🎧 Podcast curto (10–15min) — 5 XP</option>
+              <option value="speaking">🗣️ Prática de fala guiada — 15 XP</option>
+              <option value="writing">✍️ Mini escrita (5–10 linhas) — 5 XP</option>
+              <option value="vocab">📚 Conjugação/Vocabulário — 5 XP</option>
+              <option value="record">🪞 Gravação + autoavaliação — 10 XP</option>
+              <option value="custom">✨ Custom (definir XP)</option>
+            </select>
+          </div>
+          <div>
+            <label for="minutes">Minutos (opcional)</label>
+            <input id="minutes" type="number" min="0" placeholder="ex: 30" />
+          </div>
+        </div>
+        <div>
+          <label for="notes">Notas (opcional)</label>
+          <textarea id="notes" placeholder="O que você praticou? Link? Tema?"></textarea>
+        </div>
+        <div class="grid2">
+          <div>
+            <label for="xp">XP</label>
+            <input id="xp" type="number" min="0" step="1" required />
+          </div>
+          <button class="primary" type="submit">Adicionar atividade</button>
+          <button type="button" class="ghost" id="resetMonthBtn">Zerar mês atual</button>
+        </div>
+      </form>
+      <div class="row" style="margin-top:10px">
+        <button class="ghost" id="exportBtn">Exportar JSON</button>
+        <button class="ghost" id="importBtn">Importar JSON</button>
+      </div>
+      <input type="file" id="fileInput" accept="application/json" style="display:none" />
+    </aside>
+
+    <section class="card" style="grid-column: 1 / -1;">
+      <h3 style="margin-top:0">Atividades do mês</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Data</th>
+            <th>Tipo</th>
+            <th>XP</th>
+            <th>Min</th>
+            <th>Notas</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </section>
+
+    <section class="card" style="grid-column: 1 / -1;">
+      <h3 style="margin-top:0">Medalhas</h3>
+      <div class="badges" id="badges"></div>
+    </section>
+  </main>
+
+  <footer>
+    Feito com ♥ para a Bruna — modo profe 🎓 | <a class="link" href="#" id="installBtn">Instalar (PWA)</a>
+  </footer>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'es_rpg_progress_v1';
+  const state = load();
+  const $ = sel => document.querySelector(sel);
+  const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+  // --- Activity types & default XP
+  const TYPES = {
+    movie:   {label:'Filme/Série', xp:10, emoji:'🎬'},
+    podcast: {label:'Podcast curto', xp:5, emoji:'🎧'},
+    speaking:{label:'Prática de fala', xp:15, emoji:'🗣️'},
+    writing: {label:'Mini escrita', xp:5, emoji:'✍️'},
+    vocab:   {label:'Conjugação/Vocabulário', xp:5, emoji:'📚'},
+    record:  {label:'Gravação + autoavaliação', xp:10, emoji:'🪞'},
+    custom:  {label:'Custom', xp:0, emoji:'✨'},
+  };
+
+  // --- Medal definitions
+  const MEDALS = [
+    {id:'FIRST_MOVIE',  name:'Primera película en español', emoji:'🥇', cond:(acts)=>acts.some(a=>a.type==='movie') , desc:'Primeiro filme/série em espanhol concluído.'},
+    {id:'FIRST_SPEAK',  name:'Primera práctica de habla',   emoji:'🗣️', cond:(acts)=>acts.some(a=>a.type==='speaking'), desc:'Primeira sessão de fala guiada.'},
+    {id:'PODCAST_START',name:'Oídos en marcha',             emoji:'🎧', cond:(acts)=>acts.some(a=>a.type==='podcast'), desc:'Primeiro podcast curto concluído.'},
+    {id:'WEEK_STREAK',  name:'Semana consistente',          emoji:'🔥', cond:weekStreak, desc:'3 ou mais dias ativos em uma semana.'},
+    {id:'MONTH_100',    name:'Meta do mês alcançada',       emoji:'🏆', cond:(acts)=>sumXP(acts)>=100, desc:'100 XP ou mais no mês.'},
+  ];
+
+  // --- Initialize UI
+  initFormDefaults();
+  renderAll();
+  attachEvents();
+  registerPWA();
+
+  // --- Functions
+  function load(){
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { activities: [] }; }
+    catch(e){ return { activities: [] } }
+  }
+  function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  function todayStr(){
+    const d = new Date();
+    const off = d.getTimezoneOffset();
+    const d2 = new Date(d.getTime() - off*60000); // local date to ISO date
+    return d2.toISOString().slice(0,10);
+  }
+  function monthKey(d){
+    const z = new Date(d);
+    return z.getFullYear()+'-'+String(z.getMonth()+1).padStart(2,'0');
+  }
+  function currentMonthKey(){ return monthKey(new Date()); }
+
+  function initFormDefaults(){
+    $('#date').value = todayStr();
+    const typeSel = $('#type');
+    const xpInput = $('#xp');
+    const setXP = ()=>{
+      const t = TYPES[typeSel.value];
+      xpInput.value = t ? t.xp : 0;
+    };
+    setXP();
+    typeSel.addEventListener('change', setXP);
+  }
+
+  function attachEvents(){
+    $('#activityForm').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const date = $('#date').value;
+      const type = $('#type').value;
+      const minutes = Number($('#minutes').value || 0);
+      const xp = Math.max(0, Math.floor(Number($('#xp').value || 0)));
+      const notes = $('#notes').value.trim();
+      if(!date || !type || isNaN(xp)) return;
+      state.activities.push({ id: crypto.randomUUID(), date, type, minutes, xp, notes });
+      save();
+      e.target.reset();
+      initFormDefaults();
+      renderAll();
+    });
+
+    $('#resetMonthBtn').addEventListener('click', ()=>{
+      const mk = currentMonthKey();
+      state.activities = state.activities.filter(a => monthKey(a.date) !== mk ? true : !confirm(`Remover atividade de ${a.date}?`));
+      save(); renderAll();
+    });
+
+    $('#exportBtn').addEventListener('click', ()=>{
+      const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'rpg-espanol-progress.json';
+      a.click(); URL.revokeObjectURL(url);
+    });
+
+    $('#importBtn').addEventListener('click', ()=> $('#fileInput').click());
+    $('#fileInput').addEventListener('change', (e)=>{
+      const f = e.target.files[0]; if(!f) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const data = JSON.parse(reader.result);
+          if(!data || !Array.isArray(data.activities)) throw new Error('JSON inválido');
+          state.activities = data.activities; save(); renderAll();
+        }catch(err){ alert('Falha ao importar: '+err.message); }
+      };
+      reader.readAsText(f);
+    });
+  }
+
+  function renderAll(){
+    const mk = currentMonthKey();
+    $('#monthLabel').textContent = 'Mês atual: '+mk;
+
+    const actsMonth = state.activities.filter(a => monthKey(a.date) === mk).sort((a,b)=> a.date.localeCompare(b.date));
+    renderTable(actsMonth);
+    const xp = sumXP(actsMonth);
+    const pct = Math.min(100, Math.round((xp/100)*100));
+    $('#xpMonth').textContent = xp;
+    $('#pctMonth').textContent = pct+'%';
+    $('#countMonth').textContent = actsMonth.length;
+    $('#barMonth').style.width = pct+'%';
+    $('#barPct').textContent = pct+'%';
+
+    const badges = MEDALS.filter(m => m.cond(actsMonth));
+    $('#countBadges').textContent = badges.length;
+    renderBadges(badges);
+
+    renderWeeks(actsMonth);
+
+    // Level label (simple flavor by month progress)
+    let levelName = 'Exploradora del idioma';
+    if(xp>=25) levelName='Comunicadora en marcha';
+    if(xp>=50) levelName='Oradora consistente';
+    if(xp>=75) levelName='Profesional segura';
+    if(xp>=100) levelName='Nativa honoraria';
+    $('#levelLabel').textContent = 'Nível 1 — '+levelName;
+  }
+
+  function sumXP(list){ return list.reduce((a,b)=>a + (Number(b.xp)||0), 0); }
+
+  function renderTable(list){
+    const tbody = $('#tbody');
+    tbody.innerHTML = '';
+    if(list.length===0){
+      const tr = document.createElement('tr');
+      tr.innerHTML = '<td colspan="6" style="color:var(--muted)">Sem atividades registradas neste mês.</td>';
+      tbody.appendChild(tr);
+      return;
+    }
+    for(const a of list){
+      const tr = document.createElement('tr');
+      const t = TYPES[a.type] || {label:a.type, emoji:'✨'};
+      tr.innerHTML = `
+        <td>${a.date}</td>
+        <td>${t.emoji} ${t.label}</td>
+        <td><b>${a.xp}</b></td>
+        <td>${a.minutes||''}</td>
+        <td>${escapeHtml(a.notes||'')}</td>
+        <td><button class="ghost" data-del="${a.id}">Excluir</button></td>
+      `;
+      tbody.appendChild(tr);
+    }
+    tbody.addEventListener('click', (e)=>{
+      const id = e.target.getAttribute('data-del');
+      if(!id) return;
+      if(confirm('Excluir esta atividade?')){
+        state.activities = state.activities.filter(x=>x.id!==id);
+        save(); renderAll();
+      }
+    }, {once:true});
+  }
+
+  function renderBadges(badges){
+    const wrap = $('#badges');
+    wrap.innerHTML = '';
+    if(badges.length===0){ wrap.innerHTML = '<div class="sub">Nenhuma medalha ainda — vamos conquistar a primeira esta semana! 💪</div>'; return; }
+    for(const b of badges){
+      const el = document.createElement('div');
+      el.className = 'badge';
+      el.innerHTML = `<div class="emoji">${b.emoji}</div>
+                      <div>
+                        <div class="name">${b.name}</div>
+                        <div class="desc">${b.desc}</div>
+                      </div>`;
+      wrap.appendChild(el);
+    }
+  }
+
+  function weekStreak(acts){
+    // true if any calendar week (Mon-Sun) has >=3 distinct days with activity
+    if(acts.length===0) return false;
+    const byWeek = new Map();
+    for(const a of acts){
+      const d = new Date(a.date);
+      const wk = isoWeekKey(d);
+      const set = byWeek.get(wk) || new Set();
+      set.add(a.date);
+      byWeek.set(wk, set);
+    }
+    for(const [wk,set] of byWeek){ if(set.size>=3) return true; }
+    return false;
+  }
+
+  function renderWeeks(acts){
+    const box = $('#weeks');
+    box.innerHTML = '<h4 style="margin:14px 0 6px">Resumo semanal</h4>';
+    // group by ISO week
+    const map = new Map();
+    for(const a of acts){
+      const wk = isoWeekKey(new Date(a.date));
+      const arr = map.get(wk) || []; arr.push(a); map.set(wk, arr);
+    }
+    const entries = Array.from(map.entries()).sort(([a],[b])=>a.localeCompare(b));
+    if(entries.length===0){ box.innerHTML += '<div class="sub">Semana ainda sem atividades.</div>'; return; }
+    for(const [wk, list] of entries){
+      const xp = sumXP(list);
+      const pct = Math.min(100, Math.round((xp/100)*100));
+      const div = document.createElement('div');
+      div.className='week';
+      div.innerHTML = `<div class="pill">Semana ${wk}</div><div class="bar"><span style="width:${pct}%"></span></div><div class="pill">${xp} XP</div>`;
+      box.appendChild(div);
+    }
+  }
+
+  function isoWeekKey(d){
+    // returns YYYY-Www (ISO week, Monday-first)
+    const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+    const dayNum = date.getUTCDay() || 7; // 1..7 with Monday=1
+    date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+    const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+    return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,'0')}`;
+  }
+
+  function escapeHtml(s){
+    return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+  }
+
+  // --- PWA (install + offline cache via inline service worker)
+  function registerPWA(){
+    if(!('serviceWorker' in navigator)) return;
+    const swCode = `
+      const CACHE = 'rpg-espanol-cache-v1';
+      self.addEventListener('install', e=>{
+        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', e=>{ e.waitUntil(self.clients.claim()); });
+      self.addEventListener('fetch', e=>{
+        e.respondWith(
+          caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
+            const copy = resp.clone();
+            caches.open(CACHE).then(c=>c.put(e.request, copy));
+            return resp;
+          }).catch(()=> caches.match('./')))
+        );
+      });`;
+    const blob = new Blob([swCode], {type:'text/javascript'});
+    navigator.serviceWorker.register(URL.createObjectURL(blob));
+
+    // simple install button (deferred prompt)
+    let deferred;
+    window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferred=e; $('#installBtn').style.display='inline'; });
+    $('#installBtn').addEventListener('click', async (e)=>{ e.preventDefault(); if(deferred){ deferred.prompt(); deferred=null; }});
+  }
+
+  // Preload example from conversation (26/10 movie 30min, 10 XP) if empty
+  if(!state.activities.length){
+    state.activities.push({ id: crypto.randomUUID(), date: new Date().toISOString().slice(0,10), type:'movie', minutes:30, xp:10, notes:'Primeiro registro: filme em espanhol (30min).'});
+    save();
+  }
+})();
+</script>
+</body>
+</html>
