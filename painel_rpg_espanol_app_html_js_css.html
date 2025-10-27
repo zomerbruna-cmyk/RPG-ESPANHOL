@@ -28,22 +28,16 @@
                   var(--bg);
       color:var(--text);
     }
-    header{
-      padding:28px 20px 6px; display:flex; align-items:center; gap:14px; flex-wrap:wrap
-    }
-    .logo{
-      height:44px; width:44px; border-radius:12px; background:linear-gradient(135deg, var(--accent), var(--accent-2));
-      display:grid; place-items:center; color:#0b1220; font-weight:900; box-shadow: var(--shadow);
-    }
+    header{padding:28px 20px 6px; display:flex; align-items:center; gap:14px; flex-wrap:wrap}
+    .logo{height:44px; width:44px; border-radius:12px; background:linear-gradient(135deg, var(--accent), var(--accent-2)); display:grid; place-items:center; color:#0b1220; font-weight:900; box-shadow: var(--shadow);}
     h1{font-size: clamp(18px, 2.4vw, 26px); margin:0}
     .sub{color:var(--muted); font-size:14px}
 
     main{padding:16px; max-width:1200px; margin:0 auto}
     .grid{display:grid; gap:16px}
-    @media(min-width:900px){ .grid{ grid-template-columns: 1.2fr .8fr } }
+    @media(min-width:1100px){ .grid{ grid-template-columns: 1.2fr .8fr } }
 
-    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)); border:1px solid rgba(255,255,255,.06);
-      border-radius:var(--radius); padding:16px; box-shadow:var(--shadow)}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,0)); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow)}
 
     .row{display:flex; gap:12px; align-items:center; flex-wrap:wrap}
     .pill{padding:6px 10px; border-radius:999px; background:rgba(255,255,255,.06); color:var(--muted); font-size:12px}
@@ -60,14 +54,11 @@
     form{display:grid; gap:10px; margin-top:8px}
     .grid2{display:grid; gap:10px}
     @media(min-width:680px){ .grid2{grid-template-columns: 1fr 1fr 1fr} }
-    input, select, textarea, button{
-      width:100%; padding:10px 12px; border-radius:12px; background:#0d1830; border:1px solid rgba(255,255,255,.08); color:var(--text);
-    }
+    input, select, textarea, button{width:100%; padding:10px 12px; border-radius:12px; background:#0d1830; border:1px solid rgba(255,255,255,.08); color:var(--text);}    
     textarea{min-height:80px; resize:vertical}
     button{cursor:pointer; font-weight:700; letter-spacing:.2px}
     .primary{background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#0b1220; border:none}
     .ghost{background:transparent; border:1px dashed rgba(255,255,255,.2); color:var(--muted)}
-    .danger{background:linear-gradient(90deg, #ffb4b4, #ff7b7b); color:#2a0b0b; border:none}
 
     table{width:100%; border-collapse: collapse; margin-top:12px; font-size:14px}
     th, td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.06)}
@@ -84,6 +75,12 @@
     .week .bar{flex:1; height:10px; background:rgba(255,255,255,.08); border-radius:999px; overflow:hidden}
     .week .bar>span{display:block; height:100%; background:linear-gradient(90deg, var(--warn), var(--ok)); width:0%; transition:width .5s}
 
+    .missions{display:grid; gap:10px}
+    .mission{display:flex; gap:12px; align-items:center; padding:12px; border:1px solid rgba(255,255,255,.08); border-radius:14px; background:rgba(255,255,255,.04)}
+    .mission .when{min-width:86px}
+    .mission .title{font-weight:700}
+    .mission .meta{color:var(--muted); font-size:12px}
+
     footer{padding:30px 16px 60px; color:var(--muted); text-align:center}
     a.link{color:var(--accent)}
   </style>
@@ -93,7 +90,7 @@
     <div class="logo">XP</div>
     <div>
       <h1>RPG do Español Avanzado — Painel de Progresso</h1>
-      <div class="sub">Níveis • XP • Medalhas • Offline-first</div>
+      <div class="sub">Níveis • XP • Medalhas • Missões diárias • Offline-first</div>
     </div>
     <div style="margin-left:auto" class="row">
       <span class="pill" id="levelLabel">Nível 1 — Exploradora del idioma</span>
@@ -111,7 +108,7 @@
         <div class="kpis">
           <div class="kpi"><div class="label">XP do mês</div><div class="value" id="xpMonth">0</div></div>
           <div class="kpi"><div class="label">Progresso</div><div class="value" id="pctMonth">0%</div></div>
-          <div class="kpi"><div class="label">Atividades</div><div class="value" id="countMonth">0</div></div>
+          <div class="kpi"><div class="label">Streak diário</div><div class="value" id="streakDay">0</div></div>
           <div class="kpi"><div class="label">Medalhas</div><div class="value" id="countBadges">0</div></div>
         </div>
       </div>
@@ -120,6 +117,12 @@
         <div class="pct" id="barPct">0%</div>
       </div>
       <div class="weeks" id="weeks"></div>
+
+      <h3 style="margin:12px 0 6px">Missão de hoje</h3>
+      <div class="missions" id="todayMissions"></div>
+
+      <h4 style="margin:14px 0 6px">Próximas missões</h4>
+      <div class="missions" id="nextMissions"></div>
     </section>
 
     <aside class="card">
@@ -135,7 +138,7 @@
             <select id="type" required>
               <option value="movie">🎬 Filme/Série (≥30min) — 10 XP</option>
               <option value="podcast">🎧 Podcast curto (10–15min) — 5 XP</option>
-              <option value="speaking">🗣️ Prática de fala guiada — 15 XP</option>
+              <option value="speaking">🗣️ Prática de fala (Aula Seg/Qua) — 15 XP</option>
               <option value="writing">✍️ Mini escrita (5–10 linhas) — 5 XP</option>
               <option value="vocab">📚 Conjugação/Vocabulário — 5 XP</option>
               <option value="record">🪞 Gravação + autoavaliação — 10 XP</option>
@@ -163,6 +166,7 @@
       <div class="row" style="margin-top:10px">
         <button class="ghost" id="exportBtn">Exportar JSON</button>
         <button class="ghost" id="importBtn">Importar JSON</button>
+        <button class="ghost" id="resetAllBtn" title="Apaga atividades, sessões e currículo">Resetar tudo (TESTE)</button>
       </div>
       <input type="file" id="fileInput" accept="application/json" style="display:none" />
     </aside>
@@ -188,31 +192,40 @@
       <h3 style="margin-top:0">Medalhas</h3>
       <div class="badges" id="badges"></div>
     </section>
+
+    <section class="card" style="grid-column: 1 / -1;">
+      <h3 style="margin-top:0">Currículo da Jornada (visão geral)</h3>
+      <div class="sub">Fases até o nível avançado — conteúdos futuros ficam <b>bloqueados</b> e aparecem como missão no dia certo.</div>
+      <div class="missions" id="curriculum"></div>
+    </section>
   </main>
 
   <footer>
-    Feito com ♥ para a Bruna — modo profe 🎓 | <a class="link" href="#" id="installBtn">Instalar (PWA)</a>
+    Feito com ♥ para a Bruna — modo profe 🎓 |
+    <a class="link" href="#" id="installBtn">Instalar (PWA)</a>
+    &nbsp;•&nbsp;
+    <a class="link" href="#" id="refreshBtn" title="Limpa cache e recarrega">Atualizar app / limpar cache</a>
   </footer>
 
 <script>
 (function(){
-  const STORAGE_KEY = 'es_rpg_progress_v1';
+  const STORAGE_KEY = 'es_rpg_progress_v5';
   const state = load();
+  if(!state.sessions) state.sessions = {}; // sessions by missionId
+
   const $ = sel => document.querySelector(sel);
   const $$ = sel => Array.from(document.querySelectorAll(sel));
 
-  // --- Activity types & default XP
   const TYPES = {
     movie:   {label:'Filme/Série', xp:10, emoji:'🎬'},
     podcast: {label:'Podcast curto', xp:5, emoji:'🎧'},
-    speaking:{label:'Prática de fala', xp:15, emoji:'🗣️'},
+    speaking:{label:'Prática de fala (Aula Seg/Qua)', xp:15, emoji:'🗣️'},
     writing: {label:'Mini escrita', xp:5, emoji:'✍️'},
     vocab:   {label:'Conjugação/Vocabulário', xp:5, emoji:'📚'},
     record:  {label:'Gravação + autoavaliação', xp:10, emoji:'🪞'},
     custom:  {label:'Custom', xp:0, emoji:'✨'},
   };
 
-  // --- Medal definitions
   const MEDALS = [
     {id:'FIRST_MOVIE',  name:'Primera película en español', emoji:'🥇', cond:(acts)=>acts.some(a=>a.type==='movie') , desc:'Primeiro filme/série em espanhol concluído.'},
     {id:'FIRST_SPEAK',  name:'Primera práctica de habla',   emoji:'🗣️', cond:(acts)=>acts.some(a=>a.type==='speaking'), desc:'Primeira sessão de fala guiada.'},
@@ -221,41 +234,36 @@
     {id:'MONTH_100',    name:'Meta do mês alcançada',       emoji:'🏆', cond:(acts)=>sumXP(acts)>=100, desc:'100 XP ou mais no mês.'},
   ];
 
-  // --- Initialize UI
+  // Build curriculum if missing, using startDate (default = today)
+  if(!state.curriculum){ state.curriculum = buildCurriculumFrom(state.startDate || todayStr()); save(); }
+
   initFormDefaults();
   renderAll();
   attachEvents();
   registerPWA();
+  startDateWatcher();
 
-  // --- Functions
   function load(){
-    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { activities: [] }; }
-    catch(e){ return { activities: [] } }
+    try{ return JSON.parse(localStorage.getItem(STORAGE_KEY)) || { activities: [], curriculum:null, startDate:null }; }
+    catch(e){ return { activities: [], curriculum:null, startDate:null } }
   }
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
 
   function todayStr(){
     const d = new Date();
     const off = d.getTimezoneOffset();
-    const d2 = new Date(d.getTime() - off*60000); // local date to ISO date
+    const d2 = new Date(d.getTime() - off*60000);
     return d2.toISOString().slice(0,10);
   }
-  function monthKey(d){
-    const z = new Date(d);
-    return z.getFullYear()+'-'+String(z.getMonth()+1).padStart(2,'0');
-  }
+  function monthKey(d){ const z = new Date(d); return z.getFullYear()+'-'+String(z.getMonth()+1).padStart(2,'0'); }
   function currentMonthKey(){ return monthKey(new Date()); }
 
   function initFormDefaults(){
     $('#date').value = todayStr();
     const typeSel = $('#type');
     const xpInput = $('#xp');
-    const setXP = ()=>{
-      const t = TYPES[typeSel.value];
-      xpInput.value = t ? t.xp : 0;
-    };
-    setXP();
-    typeSel.addEventListener('change', setXP);
+    const setXP = ()=>{ const t = TYPES[typeSel.value]; xpInput.value = t ? t.xp : 0; };
+    setXP(); typeSel.addEventListener('change', setXP);
   }
 
   function attachEvents(){
@@ -267,25 +275,21 @@
       const xp = Math.max(0, Math.floor(Number($('#xp').value || 0)));
       const notes = $('#notes').value.trim();
       if(!date || !type || isNaN(xp)) return;
-      state.activities.push({ id: crypto.randomUUID(), date, type, minutes, xp, notes });
-      save();
-      e.target.reset();
-      initFormDefaults();
-      renderAll();
+      state.activities.push({ id: uid(), date, type, minutes, xp, notes });
+      save(); e.target.reset(); initFormDefaults(); renderAll();
     });
 
     $('#resetMonthBtn').addEventListener('click', ()=>{
+      if(!confirm('Zerar todas as atividades deste mês?')) return;
       const mk = currentMonthKey();
-      state.activities = state.activities.filter(a => monthKey(a.date) !== mk ? true : !confirm(`Remover atividade de ${a.date}?`));
+      state.activities = state.activities.filter(a => monthKey(a.date) !== mk);
       save(); renderAll();
     });
 
     $('#exportBtn').addEventListener('click', ()=>{
       const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'rpg-espanol-progress.json';
-      a.click(); URL.revokeObjectURL(url);
+      const a = document.createElement('a'); a.href = url; a.download = 'rpg-espanol-progress.json'; a.click(); URL.revokeObjectURL(url);
     });
 
     $('#importBtn').addEventListener('click', ()=> $('#fileInput').click());
@@ -296,16 +300,92 @@
         try{
           const data = JSON.parse(reader.result);
           if(!data || !Array.isArray(data.activities)) throw new Error('JSON inválido');
-          state.activities = data.activities; save(); renderAll();
+          state.activities = data.activities;
+          state.curriculum = data.curriculum || state.curriculum || buildCurriculumFrom(state.startDate || todayStr());
+          state.sessions = data.sessions || state.sessions || {};
+          state.startDate = data.startDate || state.startDate;
+          save(); renderAll();
         }catch(err){ alert('Falha ao importar: '+err.message); }
       };
       reader.readAsText(f);
     });
+
+    // Start date setter (guard if elements don't exist)
+    const setStartBtn = document.querySelector('#setStartBtn');
+    if(setStartBtn){
+      setStartBtn.addEventListener('click', ()=>{
+        const input = document.querySelector('#startDate');
+        const d = input ? input.value : '';
+        if(!d) return alert('Selecione uma data inicial.');
+        state.startDate = d;
+        state.curriculum = buildCurriculumFrom(d);
+        save(); renderAll();
+      });
+    }
+
+    // Atualizar app / limpar cache
+    $('#refreshBtn').addEventListener('click', async (e)=>{
+      e.preventDefault();
+      const btn = e.target; const old = btn.textContent; btn.textContent = 'Limpando…'; btn.style.pointerEvents='none';
+      try{
+        // Limpa caches
+        if('caches' in window){ const keys = await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); }
+        // Desregistra SWs
+        if('serviceWorker' in navigator){ const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r=>r.unregister())); }
+      }catch(err){ console.warn('Falha ao limpar cache', err); }
+      btn.textContent = 'Pronto! Recarregando…';
+      setTimeout(()=> location.reload(true), 400);
+    });
+
+    // Modal controls (delegated to handle late DOM insertion)
+    document.addEventListener('click', (e)=>{ if(e.target && e.target.id==='modalClose') closeModal(); });
+    document.addEventListener('click', (e)=>{ if(e.target && e.target.id==='modal') closeModal(); });
+
+    // Reset all progression (testing) with visual feedback
+    const resetBtn = document.querySelector('#resetAllBtn');
+    if(resetBtn){
+      resetBtn.addEventListener('click', async ()=>{
+        if(!confirm('Tem certeza? Isso apagará TODAS as atividades, sessões e currículo.')) return;
+        const btn = resetBtn; const prev = btn.textContent;
+        btn.disabled = true; btn.textContent = 'Resetando...'; btn.style.opacity = '0.7';
+        try{
+          // Limpa armazenamento do app
+          localStorage.removeItem(STORAGE_KEY);
+
+          // Limpa caches e desregistra service workers (feedback incremental)
+          btn.textContent = 'Limpando cache...';
+          if('caches' in window){ const keys = await caches.keys(); await Promise.all(keys.map(k=>caches.delete(k))); }
+          btn.textContent = 'Desregistrando service worker...';
+          if('serviceWorker' in navigator){ const regs = await navigator.serviceWorker.getRegistrations(); await Promise.all(regs.map(r=>r.unregister())); }
+
+          // Reconstrói estado inicial
+          btn.textContent = 'Reiniciando dados...';
+          state.activities = [];
+          state.sessions = {};
+          state.startDate = todayStr();
+          state.curriculum = buildCurriculumFrom(state.startDate);
+          save();
+          renderAll();
+
+          btn.textContent = 'Reset concluído! Recarregando...';
+          setTimeout(()=> location.reload(true), 600);
+        }catch(err){
+          console.error('Falha ao resetar', err);
+          btn.textContent = 'Falha ao resetar';
+          alert('Falha ao resetar: '+err.message);
+          btn.disabled = false; btn.style.opacity = '';
+          setTimeout(()=>{ btn.textContent = prev; }, 1500);
+        }
+      });
+    } else {
+      console.warn('Botão #resetAllBtn não encontrado para bind do reset.');
+    }
   }
 
   function renderAll(){
     const mk = currentMonthKey();
     $('#monthLabel').textContent = 'Mês atual: '+mk;
+    if(state.startDate){ $('#startLabel').textContent = 'Início: '+state.startDate; $('#startDate').value = state.startDate; }
 
     const actsMonth = state.activities.filter(a => monthKey(a.date) === mk).sort((a,b)=> a.date.localeCompare(b.date));
     renderTable(actsMonth);
@@ -313,7 +393,6 @@
     const pct = Math.min(100, Math.round((xp/100)*100));
     $('#xpMonth').textContent = xp;
     $('#pctMonth').textContent = pct+'%';
-    $('#countMonth').textContent = actsMonth.length;
     $('#barMonth').style.width = pct+'%';
     $('#barPct').textContent = pct+'%';
 
@@ -321,9 +400,12 @@
     $('#countBadges').textContent = badges.length;
     renderBadges(badges);
 
-    renderWeeks(actsMonth);
+    $('#streakDay').textContent = dailyStreak(state.activities);
 
-    // Level label (simple flavor by month progress)
+    renderWeeks(actsMonth);
+    renderMissions();
+    renderCurriculumCard();
+
     let levelName = 'Exploradora del idioma';
     if(xp>=25) levelName='Comunicadora en marcha';
     if(xp>=50) levelName='Oradora consistente';
@@ -363,7 +445,7 @@
         state.activities = state.activities.filter(x=>x.id!==id);
         save(); renderAll();
       }
-    }, {once:true});
+    });
   }
 
   function renderBadges(badges){
@@ -383,7 +465,6 @@
   }
 
   function weekStreak(acts){
-    // true if any calendar week (Mon-Sun) has >=3 distinct days with activity
     if(acts.length===0) return false;
     const byWeek = new Map();
     for(const a of acts){
@@ -400,7 +481,6 @@
   function renderWeeks(acts){
     const box = $('#weeks');
     box.innerHTML = '<h4 style="margin:14px 0 6px">Resumo semanal</h4>';
-    // group by ISO week
     const map = new Map();
     for(const a of acts){
       const wk = isoWeekKey(new Date(a.date));
@@ -419,53 +499,311 @@
   }
 
   function isoWeekKey(d){
-    // returns YYYY-Www (ISO week, Monday-first)
     const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    const dayNum = date.getUTCDay() || 7; // 1..7 with Monday=1
+    const dayNum = date.getUTCDay() || 7;
     date.setUTCDate(date.getUTCDate() + 4 - dayNum);
     const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
     const weekNo = Math.ceil((((date - yearStart) / 86400000) + 1)/7);
     return `${date.getUTCFullYear()}-W${String(weekNo).padStart(2,'0')}`;
   }
 
-  function escapeHtml(s){
+  /* function escapeHtml(s){
     return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+  } */
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>\"']/g, function(m){
+      return ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '\"':'&quot;',
+        "'":'&#39;'
+      })[m];
+    });
   }
 
-  // --- PWA (install + offline cache via inline service worker)
+  function dailyStreak(acts){
+    if(!acts.length) return 0;
+    const days = new Set(acts.map(a=>a.date).sort());
+    let streak = 0;
+    let d = new Date();
+    for(;;){
+      const ds = toDateStr(d);
+      if(days.has(ds)){ streak++; d.setDate(d.getDate()-1); }
+      else{ break; }
+    }
+    return streak;
+  }
+
+  // ---- Missions & Curriculum ----
+  function buildCurriculumFrom(startStr){
+    const start = new Date(startStr);
+    const m0 = new Date(start.getFullYear(), start.getMonth(), 1);
+    const m1 = new Date(start.getFullYear(), start.getMonth()+1, 1);
+    const phases = [
+      { key:keyOf(m0), title: monthTitle(m0) + ' — Semana(s) iniciais: fala + sotaque argentino', goals:['Onboarding','Shadowing curto','2 aulas/semana','Primeira conversa 5 min'], missions: genMonthPlan(m0.getFullYear(), m0.getMonth(), 'first', startStr) },
+      { key:keyOf(m1), title: monthTitle(m1) + ' — Fluência guiada + reuniões', goals:['Reuniões simuladas','Vocabulário vivo','Apresentação pessoal','Pronúncia e ritmo'], missions: genMonthPlan(m1.getFullYear(), m1.getMonth(), 'second') },
+    ];
+    return { phases };
+  }
+  function monthTitle(d){
+    const meses=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+    return meses[d.getMonth()]+' '+d.getFullYear();
+  }
+  function keyOf(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+
+  function genMonthPlan(y,m,tag,startStr){
+    const dates = daysOfMonth(y,m);
+    const missions = [];
+    let aulaCount = 0;
+    const firstMonth = tag==='first';
+    const lessonTitles = firstMonth ? [
+      'Aula 0 — Bienvenida + diagnóstico de fala',
+      'Aula 1 — 5 verbos essenciais + shadowing rioplatense',
+      'Aula 2 — 5 verbos essenciais (2) + fala pessoal',
+      'Aula 3 — Revisão 10 verbos + ritmo rioplatense',
+      'Aula 4 — 5 verbos essenciais (3) + perguntas/respostas',
+      'Aula 5 — 5 verbos essenciais (4) + mini apresentação',
+      'Aula 6 — Simulação de reunião: status + blockers',
+      'Aula 7 — Expressões argentinas de conversa',
+      'Aula 8 — Conversa 5 min 100% ES + feedback'
+    ] : [
+      'Aula 1 — Reunião: dar opinião com cortes gentis',
+      'Aula 2 — Concordar/discordar com exemplos do trabalho',
+      'Aula 3 — Explicar tarefas e dependências',
+      'Aula 4 — Pedir e dar feedback objetivo',
+      'Aula 5 — Apresentação curta (2–3 min) com Q&A',
+      'Aula 6 — Escalada de problemas (stakeholders)',
+      'Aula 7 — Review de sprint em espanhol',
+      'Aula 8 — Demo/retro simulada + feedback final'
+    ];
+
+    for(const d of dates){
+      const dateStr = toDateStr(d);
+      if(startStr && keyOf(d)===keyOf(new Date(startStr)) && dateStr < startStr) continue; // ignora dias antes do início
+      const dow = d.getDay(); // 0 dom .. 6 sáb
+      if(dow===1 || dow===3){
+        const title = lessonTitles[aulaCount] || `Aula ${aulaCount+1} — prática de fala`;
+        const xp = 15;
+        missions.push({ id:uid(), date:dateStr, title, type:'speaking', xp, notes:'Sessão guiada (shadowing + fala ativa).', unlock:true, done:false });
+        aulaCount++;
+      }else if(dow===2){ missions.push({ id:uid(), date:dateStr, title:'Podcast 10–15min', type:'podcast', xp:5, notes:'Anotar 3 frases e repetir.', unlock:true, done:false }); }
+      else if(dow===4){ missions.push({ id:uid(), date:dateStr, title:'Conjugação/Vocabulário', type:'vocab', xp:5, notes:'Bloco curto de revisão.', unlock:true, done:false }); }
+      else if(dow===5){ missions.push({ id:uid(), date:dateStr, title:'Gravação + autoavaliação', type:'record', xp:10, notes:'Comparar com áudio original.', unlock:true, done:false }); }
+      else if(dow===0){ missions.push({ id:uid(), date:dateStr, title:'Filme/Série ≥30min', type:'movie', xp:10, notes:'Áudio e legendas em espanhol.', unlock:true, done:false }); }
+    }
+    return missions;
+  }
+
+  function daysOfMonth(y,m){ const first = new Date(y,m,1); const dates=[]; let d=new Date(first); while(d.getMonth()===m){ dates.push(new Date(d)); d.setDate(d.getDate()+1);} return dates; }
+  function toDateStr(d){ const z = new Date(d.getTime()-d.getTimezoneOffset()*60000); return z.toISOString().slice(0,10); }
+  function uid(){ return (crypto.randomUUID && crypto.randomUUID()) || ('id-'+Math.random().toString(36).slice(2)); }
+
+  function renderMissions(){
+    const today = todayStr();
+    const mk = currentMonthKey();
+    const ph = state.curriculum.phases.find(p=>p.key===mk);
+    const todayBox = $('#todayMissions');
+    const nextBox = $('#nextMissions');
+    todayBox.innerHTML = ''; nextBox.innerHTML='';
+    if(!ph){ todayBox.innerHTML='<div class="sub">Sem plano detalhado para este mês.</div>'; return; }
+
+    const missions = ph.missions.sort((a,b)=> a.date.localeCompare(b.date));
+    for(const ms of missions){ if(state.activities.some(a=> a.date===ms.date && a.type===ms.type && a.xp>=ms.xp)) ms.done=true; }
+
+    const todays = missions.filter(ms => ms.date===today);
+    const upcoming = missions.filter(ms => ms.date>today).slice(0,6);
+
+    if(todays.length===0){ todayBox.innerHTML = '<div class="sub">Hoje não há missão programada. ✨'; }
+    for(const ms of todays){ todayBox.appendChild(missionEl(ms,true,true)); }
+    for(const ms of upcoming){ nextBox.appendChild(missionEl(ms,false,false)); }
+  }
+
+  function missionEl(ms,highlight,showStart){
+    const div = document.createElement('div');
+    div.className='mission';
+    const t = TYPES[ms.type] || {emoji:'✨', label:'Missão'};
+    const btn = ms.done? '<span class="pill">Concluída</span>' : (showStart? `<button class="primary" data-start="${ms.id}">Iniciar</button>` : '');
+    div.innerHTML = `
+      <div class="when"><span class="pill">${ms.date}</span></div>
+      <div style="flex:1">
+        <div class="title">${t.emoji} ${ms.title}</div>
+        <div class="meta">${t.label} • ${ms.xp} XP</div>
+        <div class="meta">${escapeHtml(ms.notes||'')}</div>
+      </div>
+      <div>${btn}</div>`;
+    if(highlight) div.style.outline='2px solid rgba(96,165,250,.5)';
+
+    div.addEventListener('click', (e)=>{
+      const id = e.target.getAttribute('data-start');
+      if(!id) return;
+      openMission(ms);
+    });
+    return div;
+  }
+
+  function openMission(ms){
+    const session = getOrCreateSession(ms);
+    $('#modalTitle').textContent = `${TYPES[ms.type]?.emoji||'✨'} ${ms.title}`;
+    // Render once and update in place on changes (avoids rebind storms)
+    function renderSession(){
+      const steps = session.steps;
+      const pct = Math.round(100 * steps.filter(s=>s.done).length / steps.length);
+      const list = steps.map((s,i)=>`<label style="display:flex; align-items:center; gap:10px; margin:8px 0">
+          <input type="checkbox" data-step="${i}" ${s.done?'checked':''} />
+          <span>${escapeHtml(s.label)}</span>
+        </label>`).join('');
+      const allDone = steps.every(s=>s.done);
+      $('#modalBody').innerHTML = `
+        <div class="progress" style="margin:6px 0 12px"><span style="width:${pct}%"></span><div class="pct">${pct}%</div></div>
+        <div id="stepsWrap">${list}</div>
+        <div class="row" style="margin-top:12px; justify-content:flex-end; gap:8px">
+          <button class="ghost" id="saveSession">Salvar progresso</button>
+          <button class="primary" id="finishMission" ${allDone? '' : 'disabled'}>Concluir missão (${ms.xp} XP)</button>
+        </div>`;
+      $('#stepsWrap').addEventListener('change', (e)=>{
+        const idx = e.target.getAttribute('data-step');
+        if(idx==null) return;
+        session.steps[idx].done = e.target.checked;
+        state.sessions[ms.id] = session; save();
+        // just re-render inner body
+        renderSession();
+      });
+      $('#saveSession').addEventListener('click', ()=>{ state.sessions[ms.id] = session; save(); closeModal(); });
+      $('#finishMission').addEventListener('click', ()=>{ if(steps.every(s=>s.done)){ completeMission(ms.id); closeModal(); } });
+    }
+    renderSession();
+    openModal();
+  }
+
+  function getOrCreateSession(ms){
+    if(state.sessions[ms.id]) return state.sessions[ms.id];
+    const steps = stepTemplate(ms.type);
+    const s = { missionId: ms.id, date: ms.date, startedAt: Date.now(), steps, completed:false };
+    state.sessions[ms.id] = s; save();
+    return s;
+  }
+
+  function stepTemplate(type){
+    switch(type){
+      case 'speaking':
+        return [
+          {label:'Aquecimento: 5 verbos essenciais (voz alta, 3 tempos)', done:false},
+          {label:'Shadowing 10 min (rioplatense)', done:false},
+          {label:'Drills de perguntas/respostas (5 min)', done:false},
+          {label:'Role-play de reunião (10 min)', done:false},
+          {label:'Gravação 2–3 min + autoavaliação', done:false},
+          {label:'Anotar 3 frases para usar amanhã', done:false},
+        ];
+      case 'podcast':
+        return [
+          {label:'Escolher episódio (10–15 min)', done:false},
+          {label:'Ouvir sem pausar', done:false},
+          {label:'Anotar 3 frases úteis', done:false},
+          {label:'Repetir em voz alta', done:false},
+        ];
+      case 'vocab':
+        return [
+          {label:'Revisar 5 verbos (presente/passado/futuro)', done:false},
+          {label:'Escrever 5 frases do trabalho', done:false},
+          {label:'Mini quiz mental (active recall)', done:false},
+        ];
+      case 'record':
+        return [
+          {label:'Escolher texto/tema (1–2 min)', done:false},
+          {label:'Gravar 1–2 min falando', done:false},
+          {label:'Comparar com modelo nativo', done:false},
+          {label:'Anotar 2 ajustes de pronúncia', done:false},
+        ];
+      case 'movie':
+        return [
+          {label:'Assistir 30 min (áudio + legendas ES)', done:false},
+          {label:'Anotar 5 expressões novas', done:false},
+          {label:'Repetir 5 frases com ritmo argentino', done:false},
+        ];
+      default:
+        return [ {label:'Executar a missão', done:false} ];
+    }
+  }
+
+  function missionById(id){
+    const mk = currentMonthKey();
+    const ph = state.curriculum.phases.find(p=>p.key===mk);
+    if(!ph) return null;
+    return ph.missions.find(x=>x.id===id) || null;
+  }
+
+  function completeMission(id){
+    const mk = currentMonthKey();
+    const ph = state.curriculum.phases.find(p=>p.key===mk);
+    if(!ph) return;
+    const ms = ph.missions.find(x=>x.id===id); if(!ms) return;
+    if(ms.done) return;
+    state.activities.push({ id: uid(), date: ms.date, type: ms.type, minutes: (ms.type==='speaking'?60:(ms.type==='podcast'?15:(ms.type==='movie'?30:0))), xp: ms.xp, notes: ms.title });
+    ms.done = true;
+    if(state.sessions[id]) state.sessions[id].completed = true;
+    save(); renderAll();
+  }
+
+  function renderCurriculumCard(){
+    const box = $('#curriculum'); box.innerHTML = '';
+    for(const ph of state.curriculum.phases){
+      const isCurrent = ph.key===currentMonthKey();
+      const locked = !isCurrent && new Date(ph.key+'-01') > new Date();
+      const div = document.createElement('div');
+      div.className='mission';
+      div.innerHTML = `<div class="when"><span class="pill">${ph.key}</span></div>
+        <div style="flex:1">
+          <div class="title">${locked?'🔒':'📖'} ${ph.title}</div>
+          <div class="meta">Metas: ${ph.goals.join(' • ')}</div>
+        </div>`;
+      box.appendChild(div);
+    }
+  }
+
   function registerPWA(){
     if(!('serviceWorker' in navigator)) return;
     const swCode = `
-      const CACHE = 'rpg-espanol-cache-v1';
-      self.addEventListener('install', e=>{
-        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./'])));
-        self.skipWaiting();
-      });
+      const CACHE = 'rpg-espanol-cache-v5';
+      self.addEventListener('install', e=>{ e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['./']))); self.skipWaiting(); });
       self.addEventListener('activate', e=>{ e.waitUntil(self.clients.claim()); });
-      self.addEventListener('fetch', e=>{
-        e.respondWith(
-          caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
-            const copy = resp.clone();
-            caches.open(CACHE).then(c=>c.put(e.request, copy));
-            return resp;
-          }).catch(()=> caches.match('./')))
-        );
-      });`;
+      self.addEventListener('fetch', e=>{ e.respondWith(
+        caches.match(e.request).then(r => r || fetch(e.request).then(resp => {
+          const copy = resp.clone(); caches.open(CACHE).then(c=>c.put(e.request, copy)); return resp;
+        }).catch(()=> caches.match('./')))
+      ); });`;
     const blob = new Blob([swCode], {type:'text/javascript'});
     navigator.serviceWorker.register(URL.createObjectURL(blob));
 
-    // simple install button (deferred prompt)
-    let deferred;
-    window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferred=e; $('#installBtn').style.display='inline'; });
+    let deferred; window.addEventListener('beforeinstallprompt', (e)=>{ e.preventDefault(); deferred=e; $('#installBtn').style.display='inline'; });
     $('#installBtn').addEventListener('click', async (e)=>{ e.preventDefault(); if(deferred){ deferred.prompt(); deferred=null; }});
   }
 
-  // Preload example from conversation (26/10 movie 30min, 10 XP) if empty
+  function openModal(){ const m=$('#modal'); m.style.display='flex'; m.setAttribute('aria-hidden','false'); document.body.style.overflow='hidden'; }
+  function closeModal(){ const m=$('#modal'); m.style.display='none'; m.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
+
+  function startDateWatcher(){
+    let last = todayStr();
+    setInterval(()=>{ const now = todayStr(); if(now!==last){ last=now; renderAll(); } }, 60000);
+  }
+
+  // Seed example if empty
   if(!state.activities.length){
-    state.activities.push({ id: crypto.randomUUID(), date: new Date().toISOString().slice(0,10), type:'movie', minutes:30, xp:10, notes:'Primeiro registro: filme em espanhol (30min).'});
+    const today = new Date();
+    state.activities.push({ id: uid(), date: toDateStr(today), type:'movie', minutes:30, xp:10, notes:'Primeiro registro: filme em espanhol (30min).' });
     save();
   }
 })();
 </script>
+  <div id="modal" aria-hidden="true" role="dialog" aria-modal="true" style="position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(3,6,23,.6); backdrop-filter: blur(4px); z-index:9999">
+    <div class="card modal-card" style="width:min(780px, 94vw); max-height:88vh; overflow:auto; box-shadow:0 24px 80px rgba(0,0,0,.7); padding:16px">
+      <div class="row" style="justify-content:space-between; align-items:center; position:sticky; top:0; background:linear-gradient(180deg, rgba(16,27,52,1), rgba(16,27,52,.96)); padding-bottom:8px; z-index:1">
+        <h3 id="modalTitle" style="margin:0">Missão</h3>
+        <button class="ghost" id="modalClose">Fechar</button>
+      </div>
+      <div id="modalBody" style="margin-top:8px"></div>
+    </div>
+  </div>
 </body>
 </html>
