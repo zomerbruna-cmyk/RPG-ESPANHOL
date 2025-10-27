@@ -81,8 +81,53 @@
     .mission .title{font-weight:700}
     .mission .meta{color:var(--muted); font-size:12px}
 
+    /* Estilização do checklist no modal (aproxima do exemplo) */
+    #stepsWrap label{display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0; padding:14px; border-radius:12px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10)}
+    #stepsWrap label + label{margin-top:12px}
+    #stepsWrap label span{font-weight:600}
+    #stepsWrap label::after{content:''; min-width:68px; height:0}
+    #stepsWrap label:has(input:checked)::after{content:'Feito'; padding:6px 10px; border-radius:999px; background:var(--accent-2); color:#0b1220; font-weight:700; font-size:12px; text-align:center}
+    #saveSession{background:linear-gradient(90deg, var(--ok), #16a34a); color:#0b1220; border:none}
+    #finishMission{background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#0b1220; border:none}
+
+    /* Checklist modal styles */
+    .checklist{display:grid; gap:12px; margin:12px 0}
+    .check-item{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px; border-radius:12px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10)}
+    .check-left{display:flex; align-items:center; gap:12px}
+    .check-label{font-weight:600}
+    .done-badge{padding:6px 10px; border-radius:999px; background:var(--accent-2); color:#0b1220; font-weight:700; font-size:12px; min-width:68px; text-align:center}
+    .done-placeholder{min-width:68px}
+    .btn-success{background:linear-gradient(90deg, var(--ok), #16a34a); color:#0b1220; border:none}
+    .btn-finish{background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#0b1220; border:none}
+    .modal-sub{color:var(--muted); margin:4px 0 8px}
+  
     footer{padding:30px 16px 60px; color:var(--muted); text-align:center}
     a.link{color:var(--accent)}
+
+    /* Small close button in top-right of modal */
+    .modal-card{ position:relative }
+    .modal-card .close-btn{
+      position:absolute; top:12px; right:12px; z-index:2;
+      width:32px; height:32px; padding:0;
+      display:flex; align-items:center; justify-content:center;
+      border-radius:999px; border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.10); color:var(--text);
+      font-weight:800; font-size:18px; line-height:1; cursor:pointer;
+    }
+    .modal-card .close-btn:hover{ background:rgba(255,255,255,.16) }
+    .modal-card h3{ padding-right:44px }
+
+    /* Modal actions responsive layout */
+    #modalBody > .row{ display:grid !important; grid-template-columns: 1fr; gap:10px; justify-content:stretch !important }
+    @media(min-width:560px){ #modalBody > .row{ grid-template-columns: 1fr 1fr } }
+    #modalBody > .row > button{ width:100%; padding:12px 14px; font-weight:800 }
+    #modalBody #saveSession{ background:linear-gradient(90deg, var(--ok), #16a34a); color:#0b1220; border:none }
+    #modalBody #finishMission{ background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#0b1220; border:none }
+    /* Checklist labels wrap and align nicely */
+    #stepsWrap label{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0; padding:12px; border-radius:12px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10) }
+    #stepsWrap label + label{ margin-top:10px }
+    #stepsWrap label span{ font-weight:600; white-space:normal; line-height:1.4 }
+    #stepsWrap input[type="checkbox"]{ width:18px; height:18px }
   </style>
 </head>
 <body>
@@ -238,6 +283,7 @@
   if(!state.curriculum){ state.curriculum = buildCurriculumFrom(state.startDate || todayStr()); save(); }
 
   initFormDefaults();
+  ensureStartElements();
   renderAll();
   attachEvents();
   registerPWA();
@@ -248,6 +294,17 @@
     catch(e){ return { activities: [], curriculum:null, startDate:null } }
   }
   function save(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  function ensureStartElements(){
+    try{
+      if(!document.querySelector('#startLabel')){
+        const s = document.createElement('span'); s.id='startLabel'; s.style.display='none'; document.body.appendChild(s);
+      }
+      if(!document.querySelector('#startDate')){
+        const i = document.createElement('input'); i.id='startDate'; i.type='date'; i.style.display='none'; document.body.appendChild(i);
+      }
+    }catch(e){ /* no-op */ }
+  }
 
   function todayStr(){
     const d = new Date();
@@ -365,6 +422,7 @@
           state.startDate = todayStr();
           state.curriculum = buildCurriculumFrom(state.startDate);
           save();
+          ensureStartElements();
           renderAll();
 
           btn.textContent = 'Reset concluído! Recarregando...';
@@ -800,7 +858,7 @@
     <div class="card modal-card" style="width:min(780px, 94vw); max-height:88vh; overflow:auto; box-shadow:0 24px 80px rgba(0,0,0,.7); padding:16px">
       <div class="row" style="justify-content:space-between; align-items:center; position:sticky; top:0; background:linear-gradient(180deg, rgba(16,27,52,1), rgba(16,27,52,.96)); padding-bottom:8px; z-index:1">
         <h3 id="modalTitle" style="margin:0">Missão</h3>
-        <button class="ghost" id="modalClose">Fechar</button>
+        <button class="ghost close-btn" id="modalClose" aria-label="Fechar" title="Fechar">×</button>
       </div>
       <div id="modalBody" style="margin-top:8px"></div>
     </div>
