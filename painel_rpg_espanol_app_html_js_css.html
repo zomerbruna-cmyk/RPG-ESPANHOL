@@ -86,7 +86,14 @@
     #stepsWrap label + label{margin-top:12px}
     #stepsWrap label span{font-weight:600}
     #stepsWrap label::after{content:''; min-width:68px; height:0}
-    #stepsWrap label:has(input:checked)::after{content:'Feito'; padding:6px 10px; border-radius:999px; background:var(--accent-2); color:#0b1220; font-weight:700; font-size:12px; text-align:center}
+    /* Ensure the "Feito" pill centers text within the blue background */
+    #stepsWrap label:has(input:checked)::after{
+      content:'Feito';
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:6px 10px; border-radius:999px; background:var(--accent-2);
+      color:#0b1220; font-weight:700; font-size:12px; text-align:center;
+      line-height:1; height:auto; /* override placeholder height to avoid misalignment */
+    }
     #saveSession{background:linear-gradient(90deg, var(--ok), #16a34a); color:#0b1220; border:none}
     #finishMission{background:linear-gradient(90deg, var(--accent), var(--accent-2)); color:#0b1220; border:none}
 
@@ -107,15 +114,15 @@
     /* Small close button in top-right of modal */
     .modal-card{ position:relative }
     .modal-card .close-btn{
-      position:absolute; top:12px; right:12px; z-index:2;
-      width:32px; height:32px; padding:0;
-      display:flex; align-items:center; justify-content:center;
-      border-radius:999px; border:1px solid rgba(255,255,255,.18);
-      background:rgba(255,255,255,.10); color:var(--text);
-      font-weight:800; font-size:18px; line-height:1; cursor:pointer;
+      position:absolute; top:50%; right:12px; transform:translateY(-50%); z-index:2;
+      width:36px; height:36px; padding:0;
+      display:inline-flex; align-items:center; justify-content:center;
+      border-radius:999px; border:1px solid rgba(255,255,255,.20);
+      background:rgba(255,255,255,.12); color:var(--text);
+      font-weight:800; font-size:20px; line-height:1; cursor:pointer;
     }
-    .modal-card .close-btn:hover{ background:rgba(255,255,255,.16) }
-    .modal-card h3{ padding-right:44px }
+    .modal-card .close-btn:hover{ background:rgba(255,255,255,.18) }
+    .modal-card h3{ padding-right:56px }
 
     /* Modal actions responsive layout */
     #modalBody > .row{ display:grid !important; grid-template-columns: 1fr; gap:10px; justify-content:stretch !important }
@@ -407,7 +414,8 @@
         btn.disabled = true; btn.textContent = 'Resetando...'; btn.style.opacity = '0.7';
         try{
           // Limpa armazenamento do app
-          localStorage.removeItem(STORAGE_KEY);
+          try{ localStorage.clear(); }catch(_){ /* fallback */ localStorage.removeItem(STORAGE_KEY); }
+          try{ sessionStorage.clear(); }catch(_){ /* ignore */ }
 
           // Limpa caches e desregistra service workers (feedback incremental)
           btn.textContent = 'Limpando cache...';
@@ -421,7 +429,7 @@
           state.sessions = {};
           state.startDate = todayStr();
           state.curriculum = buildCurriculumFrom(state.startDate);
-          save();
+          // não persiste neste momento para garantir reset completo
           ensureStartElements();
           renderAll();
 
